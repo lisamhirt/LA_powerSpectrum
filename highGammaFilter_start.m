@@ -27,13 +27,58 @@ gainLoss_gamble_outcomeLoss = outcomeLoss(gainLoss_gambled);
 
 %%% pull out the voltages for when they gambled
 gambleLFP = LFPbehavBA2(gainLoss_gambled); % only voltages that they gambled on
-% gambleLFP = LFPbehav2(gainLoss_gambled); % only voltages that they gambled on
 
 % get the voltages for the trials that they gambled on and won
 gambleLFP_outcomeGain = gambleLFP(gainLoss_gamble_outcomeGain);
 
+
+
+%% Look at voltages that they lost on 
+
+% see if they loss on their gamble (copied from above) 
+gainLoss_gamble_outcomeLoss = outcomeLoss(gainLoss_gambled);
+
+% get the voltages for the trials that they gambled on and lost 
+gambleLFP_outcomeLoss = gambleLFP(gainLoss_gamble_outcomeLoss);
+
+
+
+
 %% Bandpass 
-tempLFP = mean(gambleLFP_outcomeGain{1});
-bandpass(tempLFP,[60 250],500);
+
+gambleGain_gamma = double.empty; 
+
+for bi = 1: height(gambleLFP_outcomeGain)
+
+    tempLFP = mean(gambleLFP_outcomeGain{bi});
+    bpLFP = bandpass(tempLFP,[60 250],500);
+    [yupper, ~] = envelope(bpLFP);
+    gambleGain_gamma{bi} = yupper;
+end 
+
+gambleLoss_gamma = double.empty;
+
+for ai = 1:height(gambleLFP_outcomeLoss)
+    tempLFP = mean(gambleLFP_outcomeLoss{ai});
+    bpLFP = bandpass(tempLFP,[60 250],500);
+    [yupper, ~] = envelope(bpLFP);
+    gambleLoss_gamma{ai} = yupper;
+
+end 
+
+
+
+%%
+
+
+for pi = 1:length(gambleGain_gamma)
+tempEphys = gambleGain_gamma{pi};
+
+plot(tempEphys)
+hold on 
+
+end 
+
+
 
 
