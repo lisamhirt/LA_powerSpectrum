@@ -51,7 +51,10 @@ gambleGain_gamma = double.empty;
 for bi = 1: height(gambleLFP_outcomeGain)
 
     tempLFP = mean(gambleLFP_outcomeGain{bi});
-    bpLFP = bandpass(tempLFP,[60 250],500);
+    % find 20 samples in the middle (250-270) and stick them on the front
+    % and back of bpLFP. Then when i get yupper i chop the back off before
+    % saving to get rid of edge effect 
+    bpLFP = bandpass(tempLFP,[60 250],500); % put 200 instead of 250 
     [yupper, ~] = envelope(bpLFP);
     gambleGain_gamma{bi} = yupper;
 end 
@@ -66,19 +69,50 @@ for ai = 1:height(gambleLFP_outcomeLoss)
 
 end 
 
+%% average ephys 
+
+% Gain 
+gambleGain_gamma = gambleGain_gamma';
+
+gambleGain_gamma_avg = double.empty;
+tempCellHold = double.empty; 
+
+for ti = 1:height(gambleGain_gamma)
+    tempCell = gambleGain_gamma{ti};
+    tempCellHold = tempCell(1:498); 
+    gambleGain_gamma_avg = [gambleGain_gamma_avg; tempCellHold];
+
+    tempCellHold = double.empty;
+
+end 
+
+gambleGain_gamma_avg2 = mean(gambleGain_gamma_avg, 1);
+
+% Loss 
+
+gambleLoss_gamma = gambleLoss_gamma';
+
+gambleLoss_gamma_avg = double.empty;
+tempCellHold = double.empty; 
+
+for ti = 1:height(gambleLoss_gamma)
+    tempCell = gambleLoss_gamma{ti};
+    tempCellHold = tempCell(1:499); 
+    gambleLoss_gamma_avg = [gambleLoss_gamma_avg; tempCellHold];
+
+    tempCellHold = double.empty;
+
+end 
+
+gambleLoss_gamma_avg2 = mean(gambleLoss_gamma_avg, 1);
+
 
 
 %%
 
 
-for pi = 1:length(gambleGain_gamma)
-tempEphys = gambleGain_gamma{pi};
-
-plot(tempEphys)
+plot(gambleLoss_gamma_avg2)
 hold on 
-
-end 
-
-
+plot(gambleGain_gamma_avg2)
 
 
